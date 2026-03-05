@@ -60,6 +60,8 @@ The system combines **financial indicators, transaction fraud signals, web news 
 
 Some datasets (such as fraud labels) exceed GitHub's file size limits.  
 Only sample datasets are included in this repository for demonstration purposes.
+https://www.kaggle.com/datasets/zoya77/corporate-financial-risk-assessment-dataset/data - FINANCIAL RISK ANALYSIS
+https://www.kaggle.com/datasets/computingvictor/transactions-fraud-datasets?utm_source=chatgpt.com - FRAUD DETECTION
 
 ---
 

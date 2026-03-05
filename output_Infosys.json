@@ -1,0 +1,54 @@
+{
+  "extracted_data": {
+    "company_name": "Infosys",
+    "industry": "IT Services",
+    "annual_revenue": "1,62,990 Cr",
+    "net_profit": "26,713 Cr",
+    "ebitda": "N/A",
+    "total_debt": "0 Cr (Debt-free)",
+    "total_assets": "N/A",
+    "shareholder_equity": "N/A",
+    "debt_to_equity": "N/A",
+    "current_ratio": "N/A",
+    "dscr": "N/A",
+    "gst_reported_revenue": "N/A",
+    "bank_credited_amount": "158375.29",
+    "gstr1_vs_gstr3b_mismatch": false,
+    "gstr_mismatch_details": "N/A",
+    "related_party_transaction_percent": "N/A",
+    "auditor_qualification": false,
+    "auditor_remarks": "No qualification, reservation or adverse remark",
+    "promoter_names": [
+      "Nandan M. Nilekani (Chairman)"
+    ],
+    "collateral_mentioned": "N/A",
+    "existing_loans": "0 Cr (Debt-free)",
+    "years_in_business": "40+",
+    "credit_rating": "N/A",
+    "key_risks": [
+      "Geopolitical uncertainties",
+      "AI adoption challenges",
+      "Climate change and energy transition"
+    ],
+    "key_strengths": [
+      "Diversified product and service portfolio",
+      "Strong financial position (debt-free, high liquidity)",
+      "Focus on AI, cloud, and digital solutions",
+      "Commitment to sustainability and ESG goals"
+    ],
+    "summary": "Infosys reported a strong financial performance in FY 2025 with a revenue growth of 6.1% to \u20b91,62,990 Cr and a net profit of \u20b926,713 Cr. The company maintains a debt-free balance sheet with high liquidity and continues to invest in AI, cloud, and sustainability initiatives. Auditor reports were clean with no qualifications, and the company remains focused on long-term growth and stakeholder value creation.",
+    "annual_revenue_cr": 162990.0,
+    "expected_gst_cr": 29338.2,
+    "gst_calculation_note": "GST @ 18% on \u20b9162990.0 Cr = \u20b929338.2 Cr",
+    "bank_gst_implied": 28507.55,
+    "bank_data_note": "Bank credits \u20b9158375.29 Cr implies GST of \u20b928507.55 Cr"
+  },
+  "fraud_analysis": {
+    "fraud_flags": [],
+    "total_penalty": 0,
+    "overall_fraud_risk": "CLEAN",
+    "circular_trading_detected": false,
+    "high_risk_count": 0,
+    "summary": "0 flags found. Penalty: -0 points. Risk level: CLEAN"
+  }
+}

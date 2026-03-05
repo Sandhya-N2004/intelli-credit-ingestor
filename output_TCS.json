@@ -1,0 +1,54 @@
+{
+  "extracted_data": {
+    "company_name": "Tata Consultancy Services (TCS)",
+    "industry": "IT Services",
+    "annual_revenue": "255324",
+    "net_profit": "48512",
+    "ebitda": "N/A",
+    "total_debt": "N/A",
+    "total_assets": "N/A",
+    "shareholder_equity": "N/A",
+    "debt_to_equity": "N/A",
+    "current_ratio": "N/A",
+    "dscr": "N/A",
+    "gst_reported_revenue": "N/A",
+    "bank_credited_amount": "262882.19",
+    "gstr1_vs_gstr3b_mismatch": false,
+    "gstr_mismatch_details": "N/A",
+    "related_party_transaction_percent": "N/A",
+    "auditor_qualification": false,
+    "auditor_remarks": "N/A",
+    "promoter_names": [
+      "Tata Group"
+    ],
+    "collateral_mentioned": "N/A",
+    "existing_loans": "N/A",
+    "years_in_business": "57",
+    "credit_rating": "N/A",
+    "key_risks": [
+      "Geopolitical and macroeconomic challenges",
+      "Rapid technological changes, especially in AI",
+      "Supply chain disruptions"
+    ],
+    "key_strengths": [
+      "Strong client relationships and long-term partnerships",
+      "Industry-leading margins and operational efficiency",
+      "Large AI-trained workforce and innovative solutions",
+      "Global presence and diverse service offerings"
+    ],
+    "summary": "Tata Consultancy Services (TCS) reported a robust financial performance in FY 2025 with annual revenue of \u20b9255,324 crore, growing 6.0% year-on-year. The company achieved industry-leading operating margins of 24.3% and net margins of 19.0%. TCS continues to invest in AI and digital transformation, positioning itself as a leader in the IT services industry. The company has a strong focus on innovation, client satisfaction, and long-term value creation, with a significant emphasis on Generative AI (GenAI) and autonomous operations.",
+    "annual_revenue_cr": 255324.0,
+    "expected_gst_cr": 45958.32,
+    "gst_calculation_note": "GST @ 18% on \u20b9255324.0 Cr = \u20b945958.32 Cr",
+    "bank_gst_implied": 47318.79,
+    "bank_data_note": "Bank credits \u20b9262882.19 Cr implies GST of \u20b947318.79 Cr"
+  },
+  "fraud_analysis": {
+    "fraud_flags": [],
+    "total_penalty": 0,
+    "overall_fraud_risk": "CLEAN",
+    "circular_trading_detected": false,
+    "high_risk_count": 0,
+    "summary": "0 flags found. Penalty: -0 points. Risk level: CLEAN"
+  }
+}

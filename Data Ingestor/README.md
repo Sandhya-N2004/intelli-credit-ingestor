@@ -42,7 +42,7 @@ intelli-credit-ingestor/
     sample_docs/
       *.pdf                    # Company annual reports
       universal_bank_transactions.csv
-  index.html                   # Interactive knowledge graph visualization
+  index.html                   # Interactive web dashboard
   requirements.txt
   .gitignore
 ```
@@ -240,7 +240,7 @@ The system processes any company without prior configuration. When new documents
 | AI Model | Cohere command-a-03-2025 |
 | Data Processing | pandas, numpy |
 | Configuration | python-dotenv |
-| Visualization | Vanilla JS + HTML Canvas |
+| Dashboard | Vanilla JS + HTML5 |
 | Output Format | JSON |
 
 ---

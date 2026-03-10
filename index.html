@@ -3,1501 +3,1231 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>IntelliCredit — Corporate Credit Appraisal</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<title>IntelliCredit — AI-Powered Corporate Credit Appraisal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,wght@0,300;0,500;1,300&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --bg: #0a0e14;
-    --surface: #111620;
-    --surface2: #161d2a;
-    --border: #1e2a3a;
-    --gold: #c8a84b;
-    --gold-dim: #7a6228;
-    --teal: #2dd4bf;
-    --teal-dim: #0d4f48;
-    --red: #f87171;
-    --green: #4ade80;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --mono: 'IBM Plex Mono', monospace;
-    --serif: 'DM Serif Display', serif;
-    --sans: 'DM Sans', sans-serif;
+    --ink: #0a0b0d;
+    --paper: #f4f1eb;
+    --cream: #ede8df;
+    --gold: #c9a84c;
+    --gold-dim: #8b6f2e;
+    --rust: #c4622d;
+    --teal: #1f6b6b;
+    --teal-light: #2a8f8f;
+    --muted: #6b6560;
+    --border: #d4cec4;
+    --card: #faf8f4;
+    --shadow: rgba(10,11,13,0.08);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
+    font-family: 'DM Mono', monospace;
+    background: var(--paper);
+    color: var(--ink);
     overflow-x: hidden;
   }
 
-  /* Background grid */
+  /* ─── NOISE OVERLAY ─── */
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(200,168,75,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(200,168,75,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4;
   }
 
-  /* Glows */
-  body::after {
-    content: '';
-    position: fixed;
-    top: -200px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 800px;
-    height: 400px;
-    background: radial-gradient(ellipse, rgba(200,168,75,0.07) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-  /* ── HEADER ── */
-  header {
-    border-bottom: 1px solid var(--border);
-    padding: 18px 0;
-    position: sticky;
-    top: 0;
-    background: rgba(10,14,20,0.92);
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(244,241,235,0.85);
     backdrop-filter: blur(12px);
-    z-index: 100;
+    border-bottom: 1px solid var(--border);
   }
-  .header-inner { display: flex; align-items: center; justify-content: space-between; }
-  .logo { display: flex; align-items: baseline; gap: 10px; }
-  .logo-mark {
-    font-family: var(--serif);
-    font-size: 22px;
-    color: var(--gold);
-    letter-spacing: -0.5px;
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 0.5rem;
+    text-decoration: none; color: var(--ink);
   }
-  .logo-mark span { color: var(--text); }
-  .logo-badge {
-    font-family: var(--mono);
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    padding: 2px 7px;
-    border-radius: 2px;
+
+  .nav-logo-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold); display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
   }
-  nav { display: flex; gap: 32px; align-items: center; }
-  nav a {
-    font-size: 13px;
-    color: var(--muted);
-    text-decoration: none;
-    font-weight: 300;
-    letter-spacing: 0.3px;
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.7; }
+  }
+
+  .nav-links {
+    display: flex; gap: 2rem; list-style: none;
+    font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  .nav-links a {
+    color: var(--muted); text-decoration: none;
     transition: color 0.2s;
   }
-  nav a:hover, nav a.active { color: var(--text); }
-  nav a.active { color: var(--gold); }
-  .btn-primary {
-    background: var(--gold);
-    color: #0a0e14;
-    border: none;
-    padding: 8px 18px;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: opacity 0.2s, transform 0.1s;
-    text-transform: uppercase;
-  }
-  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .nav-links a:hover { color: var(--ink); }
 
-  /* ── HERO ── */
-  .hero { padding: 80px 0 60px; }
-  .hero-eyebrow {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .nav-cta {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem; font-weight: 600;
+    background: var(--ink); color: var(--paper);
+    padding: 0.5rem 1.25rem; border-radius: 2px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
   }
-  .hero-eyebrow::before {
-    content: '';
-    display: block;
-    width: 32px;
-    height: 1px;
-    background: var(--gold);
-  }
-  .hero h1 {
-    font-family: var(--serif);
-    font-size: clamp(40px, 5vw, 68px);
-    line-height: 1.08;
-    letter-spacing: -1px;
-    max-width: 720px;
-    margin-bottom: 24px;
-  }
-  .hero h1 em { font-style: italic; color: var(--gold); }
-  .hero-sub {
-    font-size: 16px;
-    color: var(--muted);
-    font-weight: 300;
-    max-width: 520px;
-    line-height: 1.7;
-    margin-bottom: 40px;
-  }
-  .hero-actions { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-  .btn-ghost {
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: 8px 18px;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: border-color 0.2s, color 0.2s;
-    text-transform: uppercase;
-  }
-  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+  .nav-cta:hover { background: var(--teal); transform: translateY(-1px); }
 
-  /* Stats bar */
-  .stats-bar {
-    display: flex;
-    gap: 0;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-    margin: 48px 0 60px;
-    background: var(--surface);
-  }
-  .stat-item {
-    flex: 1;
-    padding: 22px 28px;
-    border-right: 1px solid var(--border);
-    position: relative;
-  }
-  .stat-item:last-child { border-right: none; }
-  .stat-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-  .stat-value {
-    font-family: var(--serif);
-    font-size: 28px;
-    color: var(--text);
-    letter-spacing: -0.5px;
-  }
-  .stat-value.gold { color: var(--gold); }
-  .stat-delta {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--green);
-    margin-top: 3px;
-  }
-
-  /* ── UPLOAD SECTION ── */
-  .section { margin-bottom: 56px; }
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  .section-title {
-    font-family: var(--serif);
-    font-size: 26px;
-    letter-spacing: -0.5px;
-  }
-  .section-tag {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    padding: 2px 8px;
-    border-radius: 2px;
-  }
-
-  .upload-area {
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    padding: 56px 32px;
-    text-align: center;
-    background: var(--surface);
-    cursor: pointer;
-    transition: border-color 0.25s, background 0.25s;
-    position: relative;
-    overflow: hidden;
-  }
-  .upload-area::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, rgba(200,168,75,0.05) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .upload-area:hover, .upload-area.drag-over {
-    border-color: var(--gold-dim);
-    background: var(--surface2);
-  }
-  .upload-icon {
-    width: 52px;
-    height: 52px;
-    margin: 0 auto 18px;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gold);
-    font-size: 22px;
-  }
-  .upload-title { font-family: var(--serif); font-size: 20px; margin-bottom: 8px; }
-  .upload-sub { font-size: 13px; color: var(--muted); font-weight: 300; }
-  .upload-sub strong { color: var(--gold); font-weight: 500; }
-  #fileInput { display: none; }
-  .file-types {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    margin-top: 18px;
-    flex-wrap: wrap;
-  }
-  .file-type-badge {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding: 3px 10px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  /* ── PROCESSING PIPELINE ── */
-  .pipeline {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 56px;
-  }
-  .pipeline-step {
-    background: var(--surface);
-    padding: 28px 24px;
-    position: relative;
-    transition: background 0.2s;
-  }
-  .pipeline-step.active { background: var(--surface2); }
-  .pipeline-step.done { background: var(--surface2); }
-  .step-num {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-bottom: 14px;
-  }
-  .step-icon {
-    font-size: 24px;
-    margin-bottom: 12px;
-    display: block;
-  }
-  .step-name {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: var(--text);
-  }
-  .step-desc {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.5;
-    font-weight: 300;
-  }
-  .step-status {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border);
-  }
-  .step-status.active {
-    background: var(--gold);
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  .step-status.done { background: var(--green); }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(200,168,75,0.4); }
-    50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(200,168,75,0); }
-  }
-
-  /* ── RESULTS PANEL ── */
-  .results-grid {
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 56px;
+    gap: 0;
+    padding-top: 4.5rem;
+    position: relative;
   }
 
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .card-header {
-    padding: 18px 22px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .card-title {
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.2px;
-  }
-  .card-title-mono {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .card-body { padding: 22px; }
-
-  /* Credit score ring */
-  .score-display {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    margin-bottom: 20px;
-  }
-  .ring-wrap { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
-  .ring-svg { transform: rotate(-90deg); }
-  .ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
-  .ring-fill { fill: none; stroke: var(--gold); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
-  .ring-text {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .hero-left {
+    display: flex; flex-direction: column;
     justify-content: center;
+    padding: 5rem 3rem 5rem 4rem;
+    position: relative;
   }
-  .ring-score {
-    font-family: var(--serif);
-    font-size: 26px;
-    line-height: 1;
-    color: var(--gold);
+
+  .hero-tag {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold); font-weight: 500;
+    display: flex; align-items: center; gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0; animation: fadeUp 0.6s 0.2s forwards;
   }
-  .ring-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
-  .score-meta { flex: 1; }
-  .score-company { font-family: var(--serif); font-size: 20px; margin-bottom: 4px; }
-  .score-sector { font-size: 12px; color: var(--muted); font-weight: 300; margin-bottom: 12px; }
-  .rating-badge {
+
+  .hero-tag::before {
+    content: '';
+    display: inline-block; width: 24px; height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3rem, 5vw, 4.5rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    opacity: 0; animation: fadeUp 0.6s 0.35s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic; color: var(--teal);
+  }
+
+  .hero-title .accent { color: var(--gold); }
+
+  .hero-desc {
+    font-size: 0.9rem; line-height: 1.8;
+    color: var(--muted);
+    max-width: 44ch;
+    margin-bottom: 2.5rem;
+    opacity: 0; animation: fadeUp 0.6s 0.5s forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp 0.6s 0.65s forwards;
+  }
+
+  .btn-primary {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.85rem; letter-spacing: 0.04em;
+    background: var(--ink); color: var(--paper);
+    padding: 0.85rem 2rem; border-radius: 2px;
+    border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--teal); transform: translateY(-2px); }
+
+  .btn-outline {
+    font-family: 'Syne', sans-serif; font-weight: 600;
+    font-size: 0.85rem; letter-spacing: 0.04em;
+    background: transparent; color: var(--ink);
+    padding: 0.85rem 2rem; border-radius: 2px;
+    border: 1.5px solid var(--border); cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--ink); transform: translateY(-2px); }
+
+  .hero-stats {
+    margin-top: 3.5rem;
+    display: flex; gap: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    opacity: 0; animation: fadeUp 0.6s 0.8s forwards;
+  }
+
+  .hero-stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem; font-weight: 800;
+    color: var(--ink);
+  }
+
+  .hero-stat-label {
+    font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-top: 0.2rem;
+  }
+
+  /* ─── HERO RIGHT (visual panel) ─── */
+  .hero-right {
+    background: var(--ink);
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 5rem 3.5rem;
+    position: relative;
+    overflow: hidden;
+    opacity: 0; animation: fadeIn 0.8s 0.4s forwards;
+  }
+
+  .hero-right::before {
+    content: '';
+    position: absolute; top: -40%; right: -30%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(31,107,107,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero-right::after {
+    content: '';
+    position: absolute; bottom: -20%; left: -20%;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .terminal-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative; z-index: 1;
+  }
+
+  .terminal-header {
+    background: rgba(255,255,255,0.06);
+    padding: 0.7rem 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f56; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #27c93f; }
+
+  .terminal-title {
+    font-size: 0.7rem; color: rgba(255,255,255,0.4);
+    margin-left: 0.5rem; letter-spacing: 0.05em;
+  }
+
+  .terminal-body {
+    padding: 1.25rem 1.5rem;
+    font-size: 0.75rem;
+    line-height: 2;
+  }
+
+  .t-prompt { color: var(--teal-light); }
+  .t-cmd { color: rgba(255,255,255,0.85); }
+  .t-output { color: rgba(255,255,255,0.45); }
+  .t-success { color: #27c93f; }
+  .t-gold { color: var(--gold); }
+  .t-cursor {
     display: inline-block;
-    padding: 4px 12px;
-    font-family: var(--mono);
-    font-size: 12px;
-    border-radius: 3px;
-    letter-spacing: 1px;
+    width: 8px; height: 14px;
+    background: var(--teal-light);
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
   }
-  .rating-aaa { background: rgba(74,222,128,0.12); color: var(--green); border: 1px solid rgba(74,222,128,0.25); }
-  .rating-aa { background: rgba(200,168,75,0.12); color: var(--gold); border: 1px solid rgba(200,168,75,0.25); }
-  .rating-b { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.25); }
 
-  /* Financial metrics */
-  .metrics-list { display: flex; flex-direction: column; gap: 0; }
-  .metric-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 11px 0;
+  @keyframes blink {
+    0%, 100% { opacity: 1; } 50% { opacity: 0; }
+  }
+
+  .pipeline-visual {
+    margin-top: 1.5rem;
+    display: flex; flex-direction: column; gap: 0.75rem;
+    position: relative; z-index: 1;
+  }
+
+  .pipe-step {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    animation: slideRight 0.5s backwards;
+  }
+
+  .pipe-step:nth-child(1) { animation-delay: 0.9s; }
+  .pipe-step:nth-child(2) { animation-delay: 1.1s; }
+  .pipe-step:nth-child(3) { animation-delay: 1.3s; }
+
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .pipe-icon {
+    width: 32px; height: 32px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+
+  .pipe-name {
+    font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 600;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .pipe-sub {
+    font-size: 0.65rem; color: rgba(255,255,255,0.35);
+    margin-top: 0.1rem;
+  }
+
+  .pipe-badge {
+    margin-left: auto;
+    font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.2rem 0.5rem; border-radius: 20px;
+  }
+
+  .badge-active { background: rgba(39,201,63,0.15); color: #27c93f; }
+  .badge-proc { background: rgba(201,168,76,0.15); color: var(--gold); }
+
+  /* ─── SECTIONS ─── */
+  section { position: relative; z-index: 1; }
+
+  .section-header {
+    text-align: center;
+    padding: 5rem 2rem 3rem;
+  }
+
+  .section-eyebrow {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+  }
+
+  .section-eyebrow::before, .section-eyebrow::after {
+    content: ''; display: block; width: 32px; height: 1px; background: var(--gold);
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+
+  .section-sub {
+    font-size: 0.875rem; line-height: 1.8;
+    color: var(--muted); max-width: 52ch; margin: 0 auto;
+  }
+
+  /* ─── FEATURES GRID ─── */
+  .features {
+    background: var(--cream);
+    padding: 0 3rem 5rem;
+    border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
-    font-size: 13px;
-  }
-  .metric-row:last-child { border-bottom: none; }
-  .metric-name { color: var(--muted); font-weight: 300; }
-  .metric-val { font-family: var(--mono); font-size: 12px; color: var(--text); }
-  .metric-val.positive { color: var(--green); }
-  .metric-val.negative { color: var(--red); }
-
-  /* Fraud detection */
-  .fraud-panel {
-    grid-column: span 2;
-  }
-  .fraud-header-inner {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .fraud-indicator {
-    width: 10px; height: 10px; border-radius: 50%;
-  }
-  .fraud-indicator.safe { background: var(--green); }
-  .fraud-indicator.warning { background: #fbbf24; animation: pulse-warn 1.5s ease-in-out infinite; }
-  .fraud-indicator.danger { background: var(--red); animation: pulse-danger 1.5s ease-in-out infinite; }
-  @keyframes pulse-warn {
-    0%,100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.4); }
-    50% { box-shadow: 0 0 0 5px rgba(251,191,36,0); }
-  }
-  @keyframes pulse-danger {
-    0%,100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.4); }
-    50% { box-shadow: 0 0 0 5px rgba(248,113,113,0); }
   }
 
-  .fraud-grid {
+  .features-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin-bottom: 20px;
+    gap: 1.5px;
+    background: var(--border);
+    border: 1.5px solid var(--border);
+    max-width: 1100px;
+    margin: 0 auto;
   }
-  .fraud-check {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 16px 18px;
+
+  .feature-card {
+    background: var(--card);
+    padding: 2.5rem;
+    transition: background 0.2s;
+    cursor: default;
   }
-  .fraud-check-label {
-    font-size: 12px;
-    color: var(--muted);
-    font-weight: 300;
-    margin-bottom: 8px;
+
+  .feature-card:hover { background: var(--paper); }
+
+  .feature-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.65rem; font-weight: 700;
+    color: var(--gold); letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
   }
-  .fraud-check-status {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.5px;
-    display: flex;
+
+  .feature-icon-box {
+    width: 44px; height: 44px;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-radius: 4px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .feature-card:hover .feature-icon-box {
+    border-color: var(--teal); background: rgba(31,107,107,0.05);
+  }
+
+  .feature-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    margin-bottom: 0.75rem; letter-spacing: -0.01em;
+  }
+
+  .feature-desc {
+    font-size: 0.8rem; line-height: 1.8; color: var(--muted);
+  }
+
+  /* ─── WORKFLOW / PIPELINE ─── */
+  .workflow { padding: 5rem 3rem; }
+
+  .workflow-inner {
+    max-width: 1000px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
     align-items: center;
-    gap: 6px;
-  }
-  .fraud-check-status.ok { color: var(--green); }
-  .fraud-check-status.warn { color: #fbbf24; }
-  .fraud-check-status.fail { color: var(--red); }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-
-  .anomaly-list { display: flex; flex-direction: column; gap: 8px; }
-  .anomaly-item {
-    background: rgba(248,113,113,0.06);
-    border: 1px solid rgba(248,113,113,0.15);
-    border-radius: 5px;
-    padding: 12px 16px;
-    font-size: 13px;
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-  .anomaly-icon { color: var(--red); flex-shrink: 0; margin-top: 1px; }
-  .anomaly-text { color: var(--text); font-weight: 300; line-height: 1.5; }
-  .anomaly-tag {
-    font-family: var(--mono);
-    font-size: 10px;
-    background: rgba(248,113,113,0.15);
-    color: var(--red);
-    padding: 2px 7px;
-    border-radius: 2px;
-    margin-left: auto;
-    flex-shrink: 0;
-    align-self: center;
-    letter-spacing: 0.5px;
   }
 
-  .no-anomaly {
-    background: rgba(74,222,128,0.05);
-    border: 1px solid rgba(74,222,128,0.15);
-    border-radius: 5px;
-    padding: 16px;
+  .workflow-steps {
+    display: flex; flex-direction: column; gap: 0;
+  }
+
+  .workflow-step {
+    display: flex; gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    cursor: default;
+    transition: background 0.2s;
+  }
+
+  .workflow-step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem; font-weight: 800;
+    color: var(--border); 
+    width: 28px; flex-shrink: 0;
+    padding-top: 0.2rem;
+    transition: color 0.2s;
+  }
+
+  .workflow-step:hover .step-num { color: var(--gold); }
+
+  .step-content {}
+
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem; font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .step-desc {
+    font-size: 0.78rem; line-height: 1.7; color: var(--muted);
+  }
+
+  /* ─── UPLOAD PANEL (interactive) ─── */
+  .upload-panel {
+    background: var(--ink);
+    border-radius: 8px;
+    padding: 2rem;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .upload-zone {
+    border: 1.5px dashed rgba(255,255,255,0.2);
+    border-radius: 6px;
+    padding: 2.5rem;
     text-align: center;
-    font-size: 13px;
-    color: var(--green);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 1.5rem;
   }
 
-  /* Company selector */
-  .company-tabs {
-    display: flex;
-    gap: 0;
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--teal-light);
+    background: rgba(31,107,107,0.1);
+  }
+
+  .upload-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+  .upload-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+  .upload-label strong { color: var(--teal-light); }
+
+  .file-types {
+    display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem;
+  }
+
+  .file-tag {
+    font-size: 0.6rem; padding: 0.2rem 0.5rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px; color: rgba(255,255,255,0.4);
+  }
+
+  .analyze-btn {
+    width: 100%;
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.85rem;
+    background: var(--teal); color: white;
+    border: none; padding: 0.85rem;
+    border-radius: 4px; cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.05em;
+  }
+
+  .analyze-btn:hover { background: var(--teal-light); transform: translateY(-1px); }
+  .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  #upload-input { display: none; }
+
+  .file-selected {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(39,201,63,0.1);
+    border: 1px solid rgba(39,201,63,0.2);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.75rem; color: #27c93f;
+  }
+
+  /* ─── RESULTS MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(10,11,13,0.7);
+    backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card);
     border: 1px solid var(--border);
+    border-radius: 8px;
+    max-width: 680px; width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; background: var(--card);
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
+  }
+
+  .modal-close {
+    background: none; border: none; cursor: pointer;
+    font-size: 1.25rem; color: var(--muted);
+    transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--ink); }
+
+  .modal-body { padding: 2rem; }
+
+  .result-section { margin-bottom: 2rem; }
+
+  .result-section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--gold); margin-bottom: 1rem;
+    padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+  }
+
+  .result-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  }
+
+  .result-item {
+    background: var(--cream);
+    padding: 1rem 1.25rem;
+    border-radius: 4px;
+  }
+
+  .result-item-label {
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin-bottom: 0.4rem;
+  }
+
+  .result-item-value {
+    font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+  }
+
+  .risk-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8rem;
+  }
+
+  .risk-low { background: rgba(39,201,63,0.12); color: #27c93f; }
+  .risk-med { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .risk-high { background: rgba(196,98,45,0.12); color: var(--rust); }
+
+  .rec-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .rec-item {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    font-size: 0.82rem; line-height: 1.6; color: var(--ink);
+  }
+
+  .rec-item::before {
+    content: '→';
+    color: var(--teal); font-weight: 500; flex-shrink: 0;
+    margin-top: 0.05rem;
+  }
+
+  /* ─── MODULES ─── */
+  .modules { background: var(--cream); border-top: 1px solid var(--border); }
+
+  .modules-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    max-width: 1100px; margin: 0 auto;
+    gap: 2rem;
+    padding: 0 3rem 5rem;
+  }
+
+  .module-card {
+    background: var(--paper);
+    border: 1.5px solid var(--border);
     border-radius: 6px;
     overflow: hidden;
-    width: fit-content;
-    margin-bottom: 28px;
-  }
-  .company-tab {
-    padding: 9px 22px;
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--muted);
-    cursor: pointer;
-    border-right: 1px solid var(--border);
-    background: var(--surface);
-    transition: color 0.2s, background 0.2s;
-    user-select: none;
-  }
-  .company-tab:last-child { border-right: none; }
-  .company-tab:hover { color: var(--text); background: var(--surface2); }
-  .company-tab.active { background: var(--surface2); color: var(--gold); }
-
-  /* JSON Output */
-  .json-output {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 56px;
-  }
-  .json-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--surface2);
-  }
-  .json-title { font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
-  .json-actions { display: flex; gap: 8px; }
-  .json-btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    padding: 4px 12px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    border-radius: 3px;
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
-  }
-  .json-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
-  pre {
-    padding: 22px 24px;
-    font-family: var(--mono);
-    font-size: 12px;
-    line-height: 1.7;
-    color: #94a3b8;
-    max-height: 320px;
-    overflow-y: auto;
-    overflow-x: auto;
-  }
-  pre .key { color: var(--teal); }
-  pre .str { color: #86efac; }
-  pre .num { color: #fbbf24; }
-  pre .bool { color: #c084fc; }
-  pre::-webkit-scrollbar { width: 6px; height: 6px; }
-  pre::-webkit-scrollbar-track { background: transparent; }
-  pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  /* Agent section */
-  .agent-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 56px;
-  }
-  .agent-header {
-    padding: 18px 22px;
-    border-bottom: 1px solid var(--border);
-    background: linear-gradient(135deg, var(--surface2) 0%, var(--surface) 100%);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .agent-avatar {
-    width: 38px; height: 38px;
-    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .agent-name { font-size: 15px; font-weight: 500; }
-  .agent-sub { font-size: 11px; color: var(--muted); font-weight: 300; margin-top: 1px; }
-  .agent-status-chip {
-    margin-left: auto;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding: 4px 10px;
-    background: rgba(74,222,128,0.1);
-    color: var(--green);
-    border: 1px solid rgba(74,222,128,0.2);
-    border-radius: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
   }
 
-  .chat-window {
-    height: 300px;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .chat-window::-webkit-scrollbar { width: 4px; }
-  .chat-window::-webkit-scrollbar-thumb { background: var(--border); }
-
-  .msg {
-    max-width: 78%;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 13px;
-    line-height: 1.6;
-    font-weight: 300;
-  }
-  .msg-agent {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    align-self: flex-start;
-    border-bottom-left-radius: 3px;
-  }
-  .msg-user {
-    background: rgba(200,168,75,0.1);
-    border: 1px solid rgba(200,168,75,0.2);
-    align-self: flex-end;
-    border-bottom-right-radius: 3px;
-    color: var(--text);
-  }
-  .msg-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 5px;
+  .module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px var(--shadow);
   }
 
-  .chat-input-row {
-    display: flex;
-    gap: 10px;
-    padding: 16px 20px;
-    border-top: 1px solid var(--border);
-    background: var(--surface2);
-  }
-  .chat-input {
-    flex: 1;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 10px 14px;
-    font-family: var(--sans);
-    font-size: 13px;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .chat-input:focus { border-color: var(--gold-dim); }
-  .chat-input::placeholder { color: var(--muted); }
-  .send-btn {
-    background: var(--gold);
-    color: #0a0e14;
-    border: none;
-    padding: 10px 20px;
-    font-family: var(--mono);
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: 500;
-    transition: opacity 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .send-btn:hover { opacity: 0.85; }
-  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* Thinking animation */
-  .thinking {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    padding: 2px 0;
-  }
-  .thinking span {
-    width: 6px; height: 6px;
-    background: var(--muted);
-    border-radius: 50%;
-    animation: bounce 1.2s ease-in-out infinite;
-  }
-  .thinking span:nth-child(2) { animation-delay: 0.2s; }
-  .thinking span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounce {
-    0%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
+  .module-top {
+    height: 130px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem;
+    position: relative; overflow: hidden;
   }
 
-  /* Quick prompts */
-  .quick-prompts {
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .quick-btn {
-    font-size: 12px;
-    font-weight: 300;
-    padding: 5px 12px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .quick-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .module-top-a { background: linear-gradient(135deg, #0a1a1a 0%, #1f3b3b 100%); }
+  .module-top-b { background: linear-gradient(135deg, #1a150a 0%, #3b2e0f 100%); }
+  .module-top-c { background: linear-gradient(135deg, #0f0f1a 0%, #1e1e3b 100%); }
 
-  /* Footer */
+  .module-body { padding: 1.5rem; }
+
+  .module-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 800;
+    margin-bottom: 0.5rem; letter-spacing: -0.01em;
+  }
+
+  .module-desc { font-size: 0.78rem; line-height: 1.75; color: var(--muted); }
+
+  .module-tags {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;
+  }
+
+  .module-tag {
+    font-size: 0.62rem; padding: 0.2rem 0.6rem;
+    background: var(--cream); border-radius: 2px;
+    color: var(--muted); letter-spacing: 0.05em;
+  }
+
+  /* ─── FOOTER ─── */
   footer {
-    border-top: 1px solid var(--border);
-    padding: 32px 0;
-    margin-top: 20px;
+    background: var(--ink);
+    color: rgba(255,255,255,0.6);
+    padding: 3rem 4rem;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 2rem; flex-wrap: wrap;
+    font-size: 0.75rem;
   }
-  .footer-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .footer-copy { font-size: 12px; color: var(--muted); font-weight: 300; }
-  .footer-links { display: flex; gap: 24px; }
-  .footer-links a { font-size: 12px; color: var(--muted); text-decoration: none; }
-  .footer-links a:hover { color: var(--text); }
 
-  /* Animations on load */
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1rem;
+    color: white; letter-spacing: -0.02em;
+  }
+
+  .footer-links {
+    display: flex; gap: 1.5rem; list-style: none;
+  }
+
+  .footer-links a {
+    color: rgba(255,255,255,0.4); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: white; }
+
+  .footer-copy { color: rgba(255,255,255,0.25); }
+
+  /* ─── KEYFRAMES ─── */
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .hero h1 { animation: fadeUp 0.7s ease both; }
-  .hero-sub { animation: fadeUp 0.7s 0.12s ease both; }
-  .hero-actions { animation: fadeUp 0.7s 0.22s ease both; }
-  .stats-bar { animation: fadeUp 0.7s 0.34s ease both; }
 
-  /* Responsive */
-  @media (max-width: 768px) {
-    .pipeline { grid-template-columns: 1fr 1fr; }
-    .results-grid { grid-template-columns: 1fr; }
-    .fraud-panel { grid-column: span 1; }
-    .fraud-grid { grid-template-columns: 1fr; }
-    nav { display: none; }
-    .stats-bar { flex-wrap: wrap; }
-    .stat-item { min-width: 50%; }
-    .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
   }
 
-  /* Tabs */
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+  /* ─── PROGRESS BAR ─── */
+  .progress-bar {
+    height: 4px; background: var(--border); border-radius: 2px;
+    overflow: hidden; margin: 0.5rem 0;
+  }
 
-  /* Highlight active pipeline step */
-  .pipeline-step[data-step="1"] { border-top: 2px solid var(--gold); }
+  .progress-fill {
+    height: 100%; background: var(--teal);
+    border-radius: 2px; transition: width 1s ease;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 4rem 1.5rem; }
+    .features { padding: 0 1.5rem 3rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .workflow { padding: 3rem 1.5rem; }
+    .workflow-inner { grid-template-columns: 1fr; }
+    .modules-grid { grid-template-columns: 1fr; padding: 0 1.5rem 3rem; }
+    footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="container header-inner">
-    <div class="logo">
-      <div class="logo-mark">Intelli<span>Credit</span></div>
-      <div class="logo-badge">v2.1</div>
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <span class="nav-logo-dot"></span>
+    IntelliCredit
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#workflow">Pipeline</a></li>
+    <li><a href="#modules">Modules</a></li>
+    <li><a href="#ingestor">Try It</a></li>
+  </ul>
+  <a class="nav-cta" href="#ingestor">Start Analysis</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-tag">AI-Powered Corporate Credit</p>
+    <h1 class="hero-title">
+      Intelligent<br>
+      <em>credit appraisal</em><br>
+      at <span class="accent">machine</span> speed.
+    </h1>
+    <p class="hero-desc">
+      IntelliCredit ingests raw corporate financial data, orchestrates multi-agent AI analysis, and surfaces structured credit risk recommendations — in seconds, not days.
+    </p>
+    <div class="hero-actions">
+      <a href="#ingestor" class="btn-primary">Upload Financial Data</a>
+      <a href="#workflow" class="btn-outline">See the Pipeline →</a>
     </div>
-    <nav>
-      <a href="#" class="active">Dashboard</a>
-      <a href="#">Appraisals</a>
-      <a href="#">Reports</a>
-      <a href="#">Audit Trail</a>
-    </nav>
-    <button class="btn-primary">+ New Appraisal</button>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-val">3</div>
+        <div class="hero-stat-label">AI Agents</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">&lt;30s</div>
+        <div class="hero-stat-label">Full Appraisal</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">PDF/CSV</div>
+        <div class="hero-stat-label">Input Formats</div>
+      </div>
+    </div>
   </div>
-</header>
 
-<main>
-  <div class="container">
-
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-eyebrow">AI-Powered Credit Intelligence</div>
-      <h1>Corporate Credit <em>Appraisal</em> at Machine Speed</h1>
-      <p class="hero-sub">Ingest annual reports, extract structured financials, detect anomalies, and generate credit risk ratings — all in a single automated pipeline.</p>
-      <div class="hero-actions">
-        <button class="btn-primary" onclick="document.getElementById('uploadZone').click()">Upload Document</button>
-        <button class="btn-ghost">View Sample Report</button>
+  <div class="hero-right">
+    <div class="terminal-card">
+      <div class="terminal-header">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="terminal-title">intelli-credit-ingestor — pipeline</span>
       </div>
-    </section>
-
-    <!-- Stats -->
-    <div class="stats-bar">
-      <div class="stat-item">
-        <div class="stat-label">Documents Processed</div>
-        <div class="stat-value gold">2,847</div>
-        <div class="stat-delta">↑ 14% this month</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Avg. Processing Time</div>
-        <div class="stat-value">4.2s</div>
-        <div class="stat-delta">↓ 0.8s vs last week</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Fraud Flags Raised</div>
-        <div class="stat-value">38</div>
-        <div class="stat-delta" style="color:var(--red)">↑ 3 new today</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Extraction Accuracy</div>
-        <div class="stat-value gold">97.3%</div>
-        <div class="stat-delta">↑ 0.4% vs baseline</div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">›</span> <span class="t-cmd">ingest --file Q3_financials.pdf</span></div>
+        <div class="t-output">  Parsing financial statements...</div>
+        <div class="t-output">  Extracting key ratios → <span class="t-gold">42 metrics</span></div>
+        <div><span class="t-prompt">›</span> <span class="t-cmd">analyze --agent credit-manager</span></div>
+        <div class="t-output">  Running risk classification...</div>
+        <div class="t-success">  ✓ Credit Score: <strong>BBB+</strong> (Moderate)</div>
+        <div><span class="t-prompt">›</span> <span class="t-cmd">recommend --engine ml</span></div>
+        <div class="t-output">  Generating recommendations...</div>
+        <div class="t-success">  ✓ 5 actions generated</div>
+        <div><span class="t-prompt">›</span> <span class="t-cursor"></span></div>
       </div>
     </div>
 
-    <!-- Upload -->
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">Document Ingestion</div>
-        <div class="section-tag">Step 01</div>
+    <div class="pipeline-visual">
+      <div class="pipe-step">
+        <div class="pipe-icon" style="background:rgba(31,107,107,0.2)">📥</div>
+        <div>
+          <div class="pipe-name">Data Ingestor</div>
+          <div class="pipe-sub">PDF · CSV · XML parsing</div>
+        </div>
+        <div class="pipe-badge badge-active">Active</div>
       </div>
-      <div class="upload-area" id="uploadDropzone" onclick="document.getElementById('fileInput').click()">
-        <input type="file" id="fileInput" accept=".pdf,.docx,.xlsx,.csv,.json" onchange="handleFile(this)"/>
-        <div class="upload-icon">⬆</div>
-        <div class="upload-title">Drop your annual report here</div>
-        <p class="upload-sub">Drag &amp; drop or <strong>browse</strong> to upload a corporate financial document</p>
+      <div class="pipe-step">
+        <div class="pipe-icon" style="background:rgba(201,168,76,0.15)">🧠</div>
+        <div>
+          <div class="pipe-name">Credit Manager Agent</div>
+          <div class="pipe-sub">LLM orchestration · scoring</div>
+        </div>
+        <div class="pipe-badge badge-proc">Processing</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-icon" style="background:rgba(196,98,45,0.15)">🎯</div>
+        <div>
+          <div class="pipe-name">Recommendation Engine</div>
+          <div class="pipe-sub">Risk actions · structured output</div>
+        </div>
+        <div class="pipe-badge badge-active">Ready</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-header">
+    <div class="section-eyebrow">Core Capabilities</div>
+    <h2 class="section-title">Built for enterprise-grade<br>credit due diligence.</h2>
+    <p class="section-sub">Every component is purpose-built to handle the complexity of corporate financial analysis — from raw data to board-ready recommendations.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-number">01</div>
+      <div class="feature-icon-box">📄</div>
+      <div class="feature-name">Multi-Format Ingestion</div>
+      <p class="feature-desc">Accepts PDFs, CSVs, and structured XML. Automatically parses balance sheets, P&Ls, and cash flow statements into normalized machine-readable form.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-number">02</div>
+      <div class="feature-icon-box">🤖</div>
+      <div class="feature-name">LLM-Powered Agents</div>
+      <p class="feature-desc">The Credit Manager Agent leverages large language models to reason over financial narratives, flag anomalies, and apply domain-expert heuristics at scale.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-number">03</div>
+      <div class="feature-icon-box">📊</div>
+      <div class="feature-name">Ratio Extraction</div>
+      <p class="feature-desc">Computes 40+ credit ratios — liquidity, leverage, profitability, coverage, and efficiency — calibrated to industry benchmarks.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-number">04</div>
+      <div class="feature-icon-box">🎯</div>
+      <div class="feature-name">Risk Classification</div>
+      <p class="feature-desc">Maps extracted metrics to a standardized credit rating scale (AAA → D), with probabilistic confidence scores and peer comparison overlays.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-number">05</div>
+      <div class="feature-icon-box">💡</div>
+      <div class="feature-name">Recommendation Engine</div>
+      <p class="feature-desc">Generates structured, actionable credit recommendations — covenants, collateral requirements, pricing guidance — grounded in the analysis.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-number">06</div>
+      <div class="feature-icon-box">🔗</div>
+      <div class="feature-name">Structured Output</div>
+      <p class="feature-desc">Returns clean JSON/PDF reports consumable by downstream loan management systems, risk platforms, or analyst review workflows.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW / PIPELINE -->
+<section class="workflow" id="workflow">
+  <div class="workflow-inner">
+    <div>
+      <div class="section-eyebrow" style="justify-content:flex-start">The Pipeline</div>
+      <h2 class="section-title" style="text-align:left">Three stages.<br>One verdict.</h2>
+      <div class="workflow-steps">
+        <div class="workflow-step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <div class="step-title">Ingest & Normalize</div>
+            <p class="step-desc">Raw financial documents are uploaded and parsed. Tables are extracted, figures normalized, and data quality issues flagged before analysis begins.</p>
+          </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <div class="step-title">Agent Orchestration</div>
+            <p class="step-desc">The Credit Manager Agent breaks the appraisal into sub-tasks — ratio analysis, trend detection, narrative interpretation — delegated to specialized sub-agents.</p>
+          </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <div class="step-title">Score & Classify</div>
+            <p class="step-desc">Weighted scoring across dimensions produces a credit grade. Confidence intervals and sensitivity scenarios are computed automatically.</p>
+          </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <div class="step-title">Recommend & Export</div>
+            <p class="step-desc">Actionable credit recommendations are generated and bundled into a structured report for analyst review or direct system integration.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPLOAD PANEL -->
+    <div class="upload-panel" id="ingestor">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;color:white;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem;">
+        <span style="color:var(--teal-light)">▶</span> Try the Ingestor
+      </div>
+
+      <div id="file-info" class="file-selected" style="display:none;">
+        <span>📄</span>
+        <span id="file-name-display"></span>
+      </div>
+
+      <input type="file" id="upload-input" accept=".pdf,.csv,.xlsx,.xml"/>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('upload-input').click()">
+        <div class="upload-icon">📁</div>
+        <div class="upload-label"><strong>Click to upload</strong> or drag & drop</div>
         <div class="file-types">
-          <span class="file-type-badge">PDF</span>
-          <span class="file-type-badge">DOCX</span>
-          <span class="file-type-badge">XLSX</span>
-          <span class="file-type-badge">CSV</span>
-          <span class="file-type-badge">JSON</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Pipeline -->
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">Processing Pipeline</div>
-        <div class="section-tag">Automated</div>
-      </div>
-      <div class="pipeline">
-        <div class="pipeline-step active" data-step="1">
-          <div class="step-num">01 / 04</div>
-          <div class="step-status active"></div>
-          <span class="step-icon">📄</span>
-          <div class="step-name">Document Parsing</div>
-          <div class="step-desc">Extract raw text and tables from PDFs and structured documents using layout-aware parsing.</div>
-        </div>
-        <div class="pipeline-step" data-step="2">
-          <div class="step-num">02 / 04</div>
-          <div class="step-status"></div>
-          <span class="step-icon">🧠</span>
-          <div class="step-name">AI Extraction</div>
-          <div class="step-desc">LLM-powered extraction of financial statements, ratios, and KPIs into structured JSON.</div>
-        </div>
-        <div class="pipeline-step" data-step="3">
-          <div class="step-num">03 / 04</div>
-          <div class="step-status"></div>
-          <span class="step-icon">🔍</span>
-          <div class="step-name">Fraud Detection</div>
-          <div class="step-desc">Statistical and ML-based anomaly detection across revenue, liabilities, and cash flows.</div>
-        </div>
-        <div class="pipeline-step" data-step="4">
-          <div class="step-num">04 / 04</div>
-          <div class="step-status"></div>
-          <span class="step-icon">📊</span>
-          <div class="step-name">Credit Scoring</div>
-          <div class="step-desc">Credit Manager Agent synthesizes data to generate risk ratings and appraisal summaries.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Company selector -->
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">Analysis Results</div>
-        <div class="section-tag">Sample Output</div>
-      </div>
-
-      <div class="company-tabs">
-        <div class="company-tab active" onclick="switchCompany('tcs', this)">TCS</div>
-        <div class="company-tab" onclick="switchCompany('infosys', this)">Infosys</div>
-        <div class="company-tab" onclick="switchCompany('tatasteel', this)">Tata Steel</div>
-      </div>
-
-      <!-- TCS -->
-      <div class="tab-content active" id="tab-tcs">
-        <div class="results-grid">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Credit Risk Rating</div>
-              <span class="rating-badge rating-aaa">AAA</span>
-            </div>
-            <div class="card-body">
-              <div class="score-display">
-                <div class="ring-wrap">
-                  <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
-                    <circle class="ring-bg" cx="50" cy="50" r="40"/>
-                    <circle class="ring-fill" cx="50" cy="50" r="40"
-                      stroke-dasharray="251.2"
-                      stroke-dashoffset="20"
-                      stroke="var(--gold)"/>
-                  </svg>
-                  <div class="ring-text">
-                    <div class="ring-score">92</div>
-                    <div class="ring-label">/ 100</div>
-                  </div>
-                </div>
-                <div class="score-meta">
-                  <div class="score-company">Tata Consultancy Services</div>
-                  <div class="score-sector">IT Services · NSE: TCS</div>
-                  <span class="rating-badge rating-aaa">Excellent Credit</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title-mono">Financial Metrics</div>
-            </div>
-            <div class="card-body">
-              <div class="metrics-list">
-                <div class="metric-row">
-                  <span class="metric-name">Revenue (FY24)</span>
-                  <span class="metric-val">₹2,40,893 Cr</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">Net Profit</span>
-                  <span class="metric-val positive">₹46,099 Cr</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">EBITDA Margin</span>
-                  <span class="metric-val positive">26.4%</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">Debt-to-Equity</span>
-                  <span class="metric-val positive">0.04</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">Current Ratio</span>
-                  <span class="metric-val">2.8</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">ROE</span>
-                  <span class="metric-val positive">52.1%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card fraud-panel">
-            <div class="card-header">
-              <div class="fraud-header-inner">
-                <div class="fraud-indicator safe"></div>
-                <div class="card-title">Fraud Detection Report</div>
-              </div>
-              <span style="font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:1px;">CLEAN</span>
-            </div>
-            <div class="card-body">
-              <div class="fraud-grid">
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Revenue Consistency</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> Consistent YoY growth</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Auditor Signature</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> Verified — Big 4</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Cash Flow vs. Profit</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> Within normal range</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Beneish M-Score</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> −2.91 (Safe)</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Altman Z-Score</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> 4.7 (Safe Zone)</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Related Party Txns</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> Disclosed &amp; normal</div>
-                </div>
-              </div>
-              <div class="no-anomaly">✓ No anomalies detected across all 18 fraud detection checks</div>
-            </div>
-          </div>
+          <span class="file-tag">PDF</span>
+          <span class="file-tag">CSV</span>
+          <span class="file-tag">XLSX</span>
+          <span class="file-tag">XML</span>
         </div>
       </div>
 
-      <!-- Infosys -->
-      <div class="tab-content" id="tab-infosys">
-        <div class="results-grid">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Credit Risk Rating</div>
-              <span class="rating-badge rating-aa">AA+</span>
-            </div>
-            <div class="card-body">
-              <div class="score-display">
-                <div class="ring-wrap">
-                  <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
-                    <circle class="ring-bg" cx="50" cy="50" r="40"/>
-                    <circle class="ring-fill" cx="50" cy="50" r="40"
-                      stroke-dasharray="251.2"
-                      stroke-dashoffset="35"
-                      stroke="var(--gold)"/>
-                  </svg>
-                  <div class="ring-text">
-                    <div class="ring-score">86</div>
-                    <div class="ring-label">/ 100</div>
-                  </div>
-                </div>
-                <div class="score-meta">
-                  <div class="score-company">Infosys Limited</div>
-                  <div class="score-sector">IT Services · NSE: INFY</div>
-                  <span class="rating-badge rating-aa">Strong Credit</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title-mono">Financial Metrics</div>
-            </div>
-            <div class="card-body">
-              <div class="metrics-list">
-                <div class="metric-row">
-                  <span class="metric-name">Revenue (FY24)</span>
-                  <span class="metric-val">₹1,53,670 Cr</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">Net Profit</span>
-                  <span class="metric-val positive">₹26,248 Cr</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">EBITDA Margin</span>
-                  <span class="metric-val positive">24.1%</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">Debt-to-Equity</span>
-                  <span class="metric-val positive">0.07</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">Current Ratio</span>
-                  <span class="metric-val">2.3</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">ROE</span>
-                  <span class="metric-val positive">33.8%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card fraud-panel">
-            <div class="card-header">
-              <div class="fraud-header-inner">
-                <div class="fraud-indicator warning"></div>
-                <div class="card-title">Fraud Detection Report</div>
-              </div>
-              <span style="font-family:var(--mono);font-size:11px;color:#fbbf24;letter-spacing:1px;">1 FLAG</span>
-            </div>
-            <div class="card-body">
-              <div class="fraud-grid">
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Revenue Consistency</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> Consistent YoY</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Auditor Signature</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> Verified — Deloitte</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Cash Flow vs. Profit</div>
-                  <div class="fraud-check-status warn"><div class="dot"></div> Minor divergence Q3</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Beneish M-Score</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> −2.44 (Safe)</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Altman Z-Score</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> 4.1 (Safe Zone)</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Related Party Txns</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> Disclosed</div>
-                </div>
-              </div>
-              <div class="anomaly-list">
-                <div class="anomaly-item">
-                  <span class="anomaly-icon">⚠</span>
-                  <span class="anomaly-text">Q3 operating cash flow decreased by 18% while reported net profit grew 6% — possible accruals timing mismatch requiring manual review.</span>
-                  <span class="anomaly-tag">LOW RISK</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div style="margin-bottom:1rem;">
+        <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:0.5rem;">Company Name (optional)</div>
+        <input type="text" id="company-name" placeholder="e.g. Acme Corp Ltd" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.65rem 0.9rem;color:rgba(255,255,255,0.85);font-family:'DM Mono',monospace;font-size:0.8rem;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(31,143,143,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"/>
       </div>
 
-      <!-- Tata Steel -->
-      <div class="tab-content" id="tab-tatasteel">
-        <div class="results-grid">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Credit Risk Rating</div>
-              <span class="rating-badge rating-b">BBB-</span>
-            </div>
-            <div class="card-body">
-              <div class="score-display">
-                <div class="ring-wrap">
-                  <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
-                    <circle class="ring-bg" cx="50" cy="50" r="40"/>
-                    <circle class="ring-fill" cx="50" cy="50" r="40"
-                      stroke-dasharray="251.2"
-                      stroke-dashoffset="138"
-                      stroke="var(--red)"/>
-                  </svg>
-                  <div class="ring-text">
-                    <div class="ring-score" style="color:var(--red)">45</div>
-                    <div class="ring-label">/ 100</div>
-                  </div>
-                </div>
-                <div class="score-meta">
-                  <div class="score-company">Tata Steel Limited</div>
-                  <div class="score-sector">Metals &amp; Mining · NSE: TATASTEEL</div>
-                  <span class="rating-badge rating-b">Moderate Risk</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title-mono">Financial Metrics</div>
-            </div>
-            <div class="card-body">
-              <div class="metrics-list">
-                <div class="metric-row">
-                  <span class="metric-name">Revenue (FY24)</span>
-                  <span class="metric-val">₹2,29,170 Cr</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">Net Profit</span>
-                  <span class="metric-val negative">−₹4,970 Cr</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">EBITDA Margin</span>
-                  <span class="metric-val">10.8%</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">Debt-to-Equity</span>
-                  <span class="metric-val negative">1.74</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">Current Ratio</span>
-                  <span class="metric-val negative">0.9</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-name">ROE</span>
-                  <span class="metric-val negative">−3.2%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card fraud-panel">
-            <div class="card-header">
-              <div class="fraud-header-inner">
-                <div class="fraud-indicator danger"></div>
-                <div class="card-title">Fraud Detection Report</div>
-              </div>
-              <span style="font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:1px;">2 FLAGS</span>
-            </div>
-            <div class="card-body">
-              <div class="fraud-grid">
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Revenue Consistency</div>
-                  <div class="fraud-check-status warn"><div class="dot"></div> Volatile — steel cycle</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Auditor Signature</div>
-                  <div class="fraud-check-status ok"><div class="dot"></div> Verified — PwC</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Cash Flow vs. Profit</div>
-                  <div class="fraud-check-status fail"><div class="dot"></div> Significant divergence</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Beneish M-Score</div>
-                  <div class="fraud-check-status fail"><div class="dot"></div> −1.78 (Caution)</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Altman Z-Score</div>
-                  <div class="fraud-check-status warn"><div class="dot"></div> 1.8 (Grey Zone)</div>
-                </div>
-                <div class="fraud-check">
-                  <div class="fraud-check-label">Related Party Txns</div>
-                  <div class="fraud-check-status warn"><div class="dot"></div> Elevated volume</div>
-                </div>
-              </div>
-              <div class="anomaly-list">
-                <div class="anomaly-item">
-                  <span class="anomaly-icon">⚠</span>
-                  <span class="anomaly-text">Beneish M-Score of −1.78 exceeds the −1.78 threshold, suggesting possible earnings manipulation via sales manipulation index.</span>
-                  <span class="anomaly-tag">MEDIUM RISK</span>
-                </div>
-                <div class="anomaly-item">
-                  <span class="anomaly-icon">⚠</span>
-                  <span class="anomaly-text">Operating cash flow negative for 2 consecutive quarters while EBITDA remains positive — large working capital build-up detected.</span>
-                  <span class="anomaly-tag">HIGH RISK</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div style="margin-bottom:1.5rem;">
+        <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:0.5rem;">Analysis Type</div>
+        <select id="analysis-type" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.65rem 0.9rem;color:rgba(255,255,255,0.85);font-family:'DM Mono',monospace;font-size:0.8rem;outline:none;">
+          <option value="full">Full Credit Appraisal</option>
+          <option value="quick">Quick Ratio Scan</option>
+          <option value="risk">Risk Flag Only</option>
+        </select>
       </div>
-    </section>
 
-    <!-- JSON Output Preview -->
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">Structured JSON Output</div>
-        <div class="section-tag">Extractor</div>
-      </div>
-      <div class="json-output">
-        <div class="json-header">
-          <div class="json-title">output_TCS.json</div>
-          <div class="json-actions">
-            <button class="json-btn" onclick="copyJson()">Copy</button>
-            <button class="json-btn">Download</button>
-          </div>
-        </div>
-        <pre id="jsonPreview"><span class="key">{
-  "company"</span>: <span class="str">"Tata Consultancy Services Ltd"</span>,
-  <span class="key">"ticker"</span>: <span class="str">"TCS.NS"</span>,
-  <span class="key">"fiscal_year"</span>: <span class="str">"FY2024"</span>,
-  <span class="key">"extraction_date"</span>: <span class="str">"2024-05-12"</span>,
-  <span class="key">"financials"</span>: {
-    <span class="key">"revenue_inr_cr"</span>: <span class="num">240893</span>,
-    <span class="key">"net_profit_inr_cr"</span>: <span class="num">46099</span>,
-    <span class="key">"ebitda_margin_pct"</span>: <span class="num">26.4</span>,
-    <span class="key">"total_assets_inr_cr"</span>: <span class="num">183137</span>,
-    <span class="key">"total_debt_inr_cr"</span>: <span class="num">3452</span>,
-    <span class="key">"cash_equivalents_inr_cr"</span>: <span class="num">8671</span>,
-    <span class="key">"roe_pct"</span>: <span class="num">52.1</span>,
-    <span class="key">"debt_to_equity"</span>: <span class="num">0.04</span>,
-    <span class="key">"current_ratio"</span>: <span class="num">2.8</span>
-  },
-  <span class="key">"fraud_detection"</span>: {
-    <span class="key">"beneish_m_score"</span>: <span class="num">-2.91</span>,
-    <span class="key">"altman_z_score"</span>: <span class="num">4.7</span>,
-    <span class="key">"anomalies_detected"</span>: <span class="bool">false</span>,
-    <span class="key">"flags"</span>: []
-  },
-  <span class="key">"credit_appraisal"</span>: {
-    <span class="key">"score"</span>: <span class="num">92</span>,
-    <span class="key">"rating"</span>: <span class="str">"AAA"</span>,
-    <span class="key">"recommendation"</span>: <span class="str">"APPROVE"</span>,
-    <span class="key">"risk_category"</span>: <span class="str">"Minimal Risk"</span>
-  }
-}</pre>
-      </div>
-    </section>
+      <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">
+        Run AI Analysis →
+      </button>
 
-    <!-- Credit Manager Agent -->
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">Credit Manager Agent</div>
-        <div class="section-tag">AI Assistant</div>
+      <div id="progress-container" style="display:none;margin-top:1rem;">
+        <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.5rem;" id="progress-label">Initializing...</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
       </div>
-      <div class="agent-panel">
-        <div class="agent-header">
-          <div class="agent-avatar">🏦</div>
-          <div>
-            <div class="agent-name">Credit Manager Agent</div>
-            <div class="agent-sub">Powered by IntelliCredit AI · Specialised in corporate credit appraisal</div>
-          </div>
-          <div class="agent-status-chip">● Online</div>
-        </div>
-        <div class="quick-prompts">
-          <button class="quick-btn" onclick="quickPrompt(this)">Summarise TCS credit profile</button>
-          <button class="quick-btn" onclick="quickPrompt(this)">Why was Tata Steel flagged?</button>
-          <button class="quick-btn" onclick="quickPrompt(this)">Compare TCS vs Infosys risk</button>
-          <button class="quick-btn" onclick="quickPrompt(this)">Explain Beneish M-Score</button>
-        </div>
-        <div class="chat-window" id="chatWindow">
-          <div class="msg msg-agent">
-            <div class="msg-label">Credit Agent</div>
-            Hello! I'm the Credit Manager Agent. I've analysed the financial documents and can help you understand the credit appraisals, fraud flags, and financial metrics for TCS, Infosys, and Tata Steel. Ask me anything.
-          </div>
-        </div>
-        <div class="chat-input-row">
-          <input type="text" class="chat-input" id="chatInput" placeholder="Ask about credit risk, fraud flags, financial metrics…" onkeydown="if(event.key==='Enter') sendMsg()"/>
-          <button class="send-btn" id="sendBtn" onclick="sendMsg()">
-            Send ↗
-          </button>
-        </div>
-      </div>
-    </section>
-
-  </div>
-</main>
-
-<footer>
-  <div class="container footer-inner">
-    <div class="footer-copy">© 2025 IntelliCredit · AI-powered Corporate Credit Appraisal</div>
-    <div class="footer-links">
-      <a href="#">Documentation</a>
-      <a href="#">API Reference</a>
-      <a href="#">GitHub</a>
     </div>
   </div>
+</section>
+
+<!-- MODULES -->
+<section class="modules" id="modules">
+  <div class="section-header">
+    <div class="section-eyebrow">Architecture</div>
+    <h2 class="section-title">Three intelligent modules,<br>one unified system.</h2>
+  </div>
+  <div class="modules-grid">
+    <div class="module-card">
+      <div class="module-top module-top-a">📥</div>
+      <div class="module-body">
+        <div class="module-name">Data Ingestor</div>
+        <p class="module-desc">The ingestion layer handles raw document parsing and standardization. Supports scanned PDFs via OCR, CSV balance sheets, and XML financial feeds. Outputs clean, structured JSON for downstream agents.</p>
+        <div class="module-tags">
+          <span class="module-tag">OCR</span>
+          <span class="module-tag">PDF Parse</span>
+          <span class="module-tag">CSV</span>
+          <span class="module-tag">JSON Output</span>
+          <span class="module-tag">Validation</span>
+        </div>
+      </div>
+    </div>
+    <div class="module-card">
+      <div class="module-top module-top-b">🧠</div>
+      <div class="module-body">
+        <div class="module-name">Credit Manager Agent</div>
+        <p class="module-desc">An LLM-orchestrated agent that plans and executes the credit appraisal workflow. Delegates tasks to sub-agents for ratio computation, peer benchmarking, and narrative risk flags — then synthesizes a final score.</p>
+        <div class="module-tags">
+          <span class="module-tag">LLM</span>
+          <span class="module-tag">Orchestration</span>
+          <span class="module-tag">Scoring</span>
+          <span class="module-tag">Benchmarks</span>
+          <span class="module-tag">Trends</span>
+        </div>
+      </div>
+    </div>
+    <div class="module-card">
+      <div class="module-top module-top-c">🎯</div>
+      <div class="module-body">
+        <div class="module-name">Recommendation Engine</div>
+        <p class="module-desc">Transforms credit scores and risk signals into structured, actionable recommendations. Outputs covenant suggestions, pricing guidance, collateral requirements, and watch-list criteria in analyst-ready format.</p>
+        <div class="module-tags">
+          <span class="module-tag">Covenants</span>
+          <span class="module-tag">Pricing</span>
+          <span class="module-tag">Collateral</span>
+          <span class="module-tag">PDF Report</span>
+          <span class="module-tag">API Ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">IntelliCredit</div>
+    <div style="font-size:0.7rem;margin-top:0.4rem;color:rgba(255,255,255,0.25);">AI-Powered Corporate Credit Appraisal</div>
+  </div>
+  <ul class="footer-links">
+    <li><a href="https://github.com/Sandhya-N2004/intelli-credit-ingestor" target="_blank">GitHub</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#workflow">Pipeline</a></li>
+    <li><a href="#modules">Modules</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 IntelliCredit · Open Source</div>
 </footer>
 
+<!-- RESULTS MODAL -->
+<div class="modal-overlay" id="results-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📊 Credit Appraisal Report</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body-content">
+    </div>
+  </div>
+</div>
+
 <script>
-  // Drag & Drop
-  const dz = document.getElementById('uploadDropzone');
-  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-  dz.addEventListener('drop', e => {
-    e.preventDefault();
-    dz.classList.remove('drag-over');
-    const f = e.dataTransfer.files[0];
-    if (f) processFile(f.name);
+  // File upload handling
+  const uploadInput = document.getElementById('upload-input');
+  const uploadZone = document.getElementById('upload-zone');
+  const fileInfo = document.getElementById('file-info');
+  const fileNameDisplay = document.getElementById('file-name-display');
+  let selectedFile = null;
+
+  uploadInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      selectedFile = e.target.files[0];
+      fileNameDisplay.textContent = selectedFile.name;
+      fileInfo.style.display = 'flex';
+    }
   });
 
-  function handleFile(input) {
-    if (input.files[0]) processFile(input.files[0].name);
-  }
+  uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+  });
 
-  function processFile(name) {
-    const steps = document.querySelectorAll('.pipeline-step');
+  uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('drag-over');
+  });
+
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      selectedFile = files[0];
+      fileNameDisplay.textContent = selectedFile.name;
+      fileInfo.style.display = 'flex';
+    }
+  });
+
+  // Mock analysis pipeline
+  function runAnalysis() {
+    const btn = document.getElementById('analyze-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill = document.getElementById('progress-fill');
+    const progressLabel = document.getElementById('progress-label');
+    const companyName = document.getElementById('company-name').value || 'Unknown Corp';
+    const analysisType = document.getElementById('analysis-type').value;
+
+    btn.disabled = true;
+    btn.textContent = 'Analyzing...';
+    progressContainer.style.display = 'block';
+
+    const steps = [
+      { pct: 15, label: 'Parsing financial documents...' },
+      { pct: 30, label: 'Extracting ratios & metrics...' },
+      { pct: 50, label: 'Running Credit Manager Agent...' },
+      { pct: 70, label: 'Classifying risk profile...' },
+      { pct: 88, label: 'Generating recommendations...' },
+      { pct: 100, label: 'Finalizing report...' },
+    ];
+
     let i = 0;
-    steps.forEach(s => { s.classList.remove('active','done'); s.querySelector('.step-status').className = 'step-status'; });
     const interval = setInterval(() => {
-      if (i > 0) {
-        steps[i-1].classList.remove('active');
-        steps[i-1].classList.add('done');
-        steps[i-1].querySelector('.step-status').className = 'step-status done';
-      }
-      if (i < steps.length) {
-        steps[i].classList.add('active');
-        steps[i].querySelector('.step-status').className = 'step-status active';
-        i++;
-      } else {
+      if (i >= steps.length) {
         clearInterval(interval);
-        alert(`✓ Document "${name}" processed successfully!`);
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = 'Run AI Analysis →';
+          progressContainer.style.display = 'none';
+          progressFill.style.width = '0%';
+          showResults(companyName, analysisType);
+        }, 500);
+        return;
       }
-    }, 900);
+      progressFill.style.width = steps[i].pct + '%';
+      progressLabel.textContent = steps[i].label;
+      i++;
+    }, 700);
   }
 
-  // Company tabs
-  function switchCompany(company, el) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.company-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + company).classList.add('active');
-    el.classList.add('active');
+  // Mock result generation
+  function showResults(company, type) {
+    const grades = ['AAA', 'AA+', 'AA', 'A+', 'A', 'BBB+', 'BBB', 'BB+', 'BB', 'B+'];
+    const grade = grades[Math.floor(Math.random() * 6) + 2];
+    const score = Math.floor(Math.random() * 30) + 60;
+    const riskLevels = ['Low', 'Moderate', 'High'];
+    const riskLevel = score > 80 ? 'Low' : score > 65 ? 'Moderate' : 'High';
+    const riskClass = riskLevel === 'Low' ? 'risk-low' : riskLevel === 'Moderate' ? 'risk-med' : 'risk-high';
+
+    const recs = [
+      'Consider requiring quarterly financial reporting covenants given leverage trends.',
+      'Current ratio above industry median; liquidity position acceptable for proposed facility size.',
+      'Recommend interest coverage covenant of minimum 2.5× given EBITDA variability.',
+      'Collateral assessment advised for working capital line; net receivables provide partial coverage.',
+      'Monitor capex-to-depreciation ratio for potential asset deterioration signals in next cycle.',
+    ];
+
+    const ratios = [
+      { label: 'Current Ratio', val: (Math.random() * 1.5 + 1).toFixed(2) },
+      { label: 'Debt/Equity', val: (Math.random() * 1.2 + 0.4).toFixed(2) + 'x' },
+      { label: 'EBITDA Margin', val: (Math.random() * 20 + 10).toFixed(1) + '%' },
+      { label: 'Interest Coverage', val: (Math.random() * 3 + 1.5).toFixed(1) + 'x' },
+    ];
+
+    const modalBody = document.getElementById('modal-body-content');
+    modalBody.innerHTML = `
+      <div class="result-section">
+        <div class="result-section-title">Summary</div>
+        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+          <div>
+            <div style="font-family:'Fraunces',serif;font-size:2.5rem;font-weight:500;line-height:1;">${grade}</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:0.25rem;letter-spacing:0.08em;text-transform:uppercase;">Credit Grade</div>
+          </div>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;">${score}</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:0.25rem;letter-spacing:0.08em;text-transform:uppercase;">Score /100</div>
+          </div>
+          <div>
+            <div class="risk-badge ${riskClass}">${riskLevel === 'Low' ? '✓' : riskLevel === 'Moderate' ? '⚠' : '✕'} ${riskLevel} Risk</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:0.5rem;letter-spacing:0.08em;text-transform:uppercase;">Risk Classification</div>
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--muted);background:var(--cream);padding:0.85rem 1rem;border-radius:4px;">
+          <strong style="color:var(--ink);">${company}</strong> — ${type === 'full' ? 'Full credit appraisal' : type === 'quick' ? 'Quick ratio scan' : 'Risk flag analysis'} completed. ${selectedFile ? `Source: ${selectedFile.name}.` : 'Sample analysis mode.'}
+        </div>
+      </div>
+
+      <div class="result-section">
+        <div class="result-section-title">Key Ratios</div>
+        <div class="result-grid">
+          ${ratios.map(r => `
+            <div class="result-item">
+              <div class="result-item-label">${r.label}</div>
+              <div class="result-item-value">${r.val}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="result-section">
+        <div class="result-section-title">Recommendations</div>
+        <ul class="rec-list">
+          ${recs.map(r => `<li class="rec-item">${r}</li>`).join('')}
+        </ul>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;padding-top:1rem;border-top:1px solid var(--border);">
+        <button onclick="closeModal()" style="flex:1;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;background:var(--ink);color:white;border:none;padding:0.75rem;border-radius:4px;cursor:pointer;">Export Report</button>
+        <button onclick="closeModal()" style="flex:1;font-family:'Syne',sans-serif;font-weight:600;font-size:0.8rem;background:transparent;color:var(--ink);border:1.5px solid var(--border);padding:0.75rem;border-radius:4px;cursor:pointer;">Close</button>
+      </div>
+    `;
+    document.getElementById('results-modal').classList.add('open');
   }
 
-  // Copy JSON
-  function copyJson() {
-    const txt = document.getElementById('jsonPreview').innerText;
-    navigator.clipboard.writeText(txt).then(() => {
-      const btn = document.querySelector('.json-btn');
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = 'Copy', 1500);
+  function closeModal() {
+    document.getElementById('results-modal').classList.remove('open');
+  }
+
+  document.getElementById('results-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // Intersection observer for fade-in on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
     });
-  }
+  }, { threshold: 0.1 });
 
-  // Quick prompts
-  function quickPrompt(el) {
-    document.getElementById('chatInput').value = el.textContent;
-    sendMsg();
-  }
-
-  // Chat
-  const responses = {
-    default: [
-      "Based on the extracted financial data, I can provide a detailed analysis. Please specify which company or metric you'd like me to focus on.",
-      "The credit appraisal pipeline has processed the documents. I've cross-referenced the financials against our scoring model — would you like a deeper breakdown?",
-      "I've reviewed the fraud detection results. All statistical models (Beneish, Altman, Piotroski) have been applied. Let me know what insights you need.",
-    ],
-    tcs: "TCS holds an excellent credit profile — AAA rated with a score of 92/100. Key strengths include a near-zero debt-to-equity ratio of 0.04, a robust EBITDA margin of 26.4%, and an ROE of 52.1%. No fraud indicators were detected. Recommendation: Approve credit with favourable terms.",
-    infosys: "Infosys carries an AA+ rating (86/100). Financials are strong, though a minor Q3 divergence between operating cash flow and net profit was flagged. The Beneish M-Score of −2.44 is within safe range. Recommend approval with standard monitoring.",
-    tatasteel: "Tata Steel is rated BBB− (45/100) with two significant flags: a Beneish M-Score of −1.78 approaching manipulation territory, and negative operating cash flows for two consecutive quarters. Recommend conditional approval with enhanced covenants and quarterly reviews.",
-    fraud: "The fraud detection module applies 18 checks including: Beneish M-Score (earnings manipulation), Altman Z-Score (bankruptcy probability), cash flow divergence analysis, and related-party transaction monitoring. Tata Steel triggered 2 high-risk flags in this analysis.",
-    beneish: "The Beneish M-Score is a financial model using 8 financial ratios to identify earnings manipulation. A score below −1.78 suggests the company is unlikely to be manipulating earnings. Scores above −1.78 warrant further investigation. Tata Steel scored −1.78, which is right at the threshold.",
-    compare: "Comparing TCS vs Infosys: TCS leads on all key metrics — higher EBITDA margin (26.4% vs 24.1%), lower D/E (0.04 vs 0.07), higher ROE (52.1% vs 33.8%), and a cleaner fraud profile. Both are investment-grade, but TCS presents lower credit risk overall.",
-  };
-
-  let typingTimeout;
-
-  async function sendMsg() {
-    const inp = document.getElementById('chatInput');
-    const val = inp.value.trim();
-    if (!val) return;
-    inp.value = '';
-    document.getElementById('sendBtn').disabled = true;
-
-    const cw = document.getElementById('chatWindow');
-
-    // User bubble
-    const um = document.createElement('div');
-    um.className = 'msg msg-user';
-    um.innerHTML = `<div class="msg-label">You</div>${val}`;
-    cw.appendChild(um);
-
-    // Typing
-    const tm = document.createElement('div');
-    tm.className = 'msg msg-agent';
-    tm.innerHTML = `<div class="msg-label">Credit Agent</div><div class="thinking"><span></span><span></span><span></span></div>`;
-    cw.appendChild(tm);
-    cw.scrollTop = cw.scrollHeight;
-
-    const lower = val.toLowerCase();
-    let reply = responses.default[Math.floor(Math.random() * responses.default.length)];
-    if (lower.includes('tcs') && !lower.includes('vs') && !lower.includes('compare')) reply = responses.tcs;
-    else if (lower.includes('infosys')) reply = responses.infosys;
-    else if (lower.includes('tata steel') || lower.includes('tatasteel')) reply = responses.tatasteel;
-    else if (lower.includes('fraud') || lower.includes('flag') || lower.includes('detection')) reply = responses.fraud;
-    else if (lower.includes('beneish') || lower.includes('m-score') || lower.includes('altman')) reply = responses.beneish;
-    else if (lower.includes('compare') || lower.includes('vs')) reply = responses.compare;
-
-    await new Promise(r => setTimeout(r, 1200 + Math.random() * 600));
-    tm.innerHTML = `<div class="msg-label">Credit Agent</div>${reply}`;
-    cw.scrollTop = cw.scrollHeight;
-    document.getElementById('sendBtn').disabled = false;
-  }
+  document.querySelectorAll('.feature-card, .module-card, .workflow-step').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
 </script>
 </body>
 </html>
